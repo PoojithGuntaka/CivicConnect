@@ -1,3 +1,4 @@
+
 export type UserRole = 'citizen' | 'official';
 
 export type IssueStatus = 'submitted' | 'in-progress' | 'resolved';
@@ -5,6 +6,13 @@ export type IssueStatus = 'submitted' | 'in-progress' | 'resolved';
 export interface Location {
   lat: number;
   lng: number;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
 }
 
 export interface Issue {

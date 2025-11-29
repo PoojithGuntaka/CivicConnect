@@ -1,13 +1,15 @@
+
 import React, { useState } from 'react';
 import { INITIAL_ISSUES, INITIAL_POLLS } from './constants';
-import { Issue, Poll, UserRole } from './types';
+import { Issue, Poll, User } from './types';
 import { CitizenDashboard } from './components/CitizenDashboard';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Chatbot } from './components/Chatbot';
-import { LayoutDashboard, Users, ShieldCheck } from 'lucide-react';
+import { Auth } from './components/Auth';
+import { ShieldCheck, LogOut, User as UserIcon } from 'lucide-react';
 
 export default function App() {
-  const [role, setRole] = useState<UserRole>('citizen');
+  const [user, setUser] = useState<User | null>(null);
   const [issues, setIssues] = useState<Issue[]>(INITIAL_ISSUES);
   const [polls, setPolls] = useState<Poll[]>(INITIAL_POLLS);
 
@@ -32,6 +34,19 @@ export default function App() {
     }));
   };
 
+  const handleLogin = (authenticatedUser: User) => {
+    setUser(authenticatedUser);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  // If not authenticated, show Auth screen
+  if (!user) {
+    return <Auth onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Navigation Bar */}
@@ -45,27 +60,22 @@ export default function App() {
               <span className="font-bold text-xl text-slate-900 tracking-tight">CivicConnect</span>
             </div>
             
-            {/* Role Switcher for Demo Purposes */}
+            {/* User Profile & Logout */}
             <div className="flex items-center gap-4">
-              <span className="text-sm text-slate-500 hidden sm:block">View as:</span>
-              <div className="flex bg-slate-100 p-1 rounded-lg">
-                <button
-                  onClick={() => setRole('citizen')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
-                    role === 'citizen' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                  }`}
-                >
-                  <Users size={16} /> Citizen
-                </button>
-                <button
-                  onClick={() => setRole('official')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
-                    role === 'official' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                  }`}
-                >
-                  <LayoutDashboard size={16} /> Official
-                </button>
+              <div className="hidden sm:flex items-center gap-2 text-sm text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full">
+                <UserIcon size={16} />
+                <span className="font-medium">{user.name}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 uppercase tracking-wide font-bold">
+                  {user.role}
+                </span>
               </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                title="Sign Out"
+              >
+                <LogOut size={20} />
+              </button>
             </div>
           </div>
         </div>
@@ -73,10 +83,10 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        {role === 'citizen' ? (
+        {user.role === 'citizen' ? (
           <div className="animate-in fade-in duration-500">
             <header className="mb-8">
-              <h1 className="text-3xl font-bold text-slate-900">Welcome, Neighbor</h1>
+              <h1 className="text-3xl font-bold text-slate-900">Welcome, {user.name.split(' ')[0]}</h1>
               <p className="text-slate-600 mt-2">Participate in your local democracy and improve your community.</p>
             </header>
             <CitizenDashboard 
@@ -100,8 +110,8 @@ export default function App() {
         </div>
       </footer>
 
-      {/* AI Assistant - Always available for Citizens */}
-      {role === 'citizen' && <Chatbot />}
+      {/* AI Assistant - Available for everyone, but customized context could be added */}
+      <Chatbot />
     </div>
   );
 }
