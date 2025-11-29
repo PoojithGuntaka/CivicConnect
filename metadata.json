@@ -1,0 +1,8 @@
+{
+  "name": "Copy of CivicConnect: Digital Governance Platform",
+  "description": "A comprehensive platform bridging the gap between citizens and political representatives with AI-driven engagement and data analytics.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone"
+  ]
+}
